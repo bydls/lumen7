@@ -1,0 +1,89 @@
+
+api库
+
+
+CREATE TABLE `api_user`  (
+  `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `addtime` int(10) UNSIGNED NOT NULL COMMENT '添加时间',
+  `role_id` int(11) UNSIGNED NOT NULL COMMENT '角色ID',
+  `salt` char(8) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '' COMMENT '加盐扰码',
+  `nickname` varchar(20) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '' COMMENT '昵称',
+  `username` varchar(40) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '管理员登录名',
+  `password` char(32) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '密码 md5',
+  `is_del` tinyint(1) UNSIGNED NOT NULL DEFAULT 0 COMMENT '1 已删除',
+  `last_update_time` timestamp(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0),
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `username`(`username`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '用户表' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of api_user  #username=root  password=123456
+-- ----------------------------
+INSERT INTO `api_user` VALUES (1, 1586481941, 1, '', 'hbh', 'root', 'e0211dd54c6805c4606c594b121083c0', 0, '2020-04-10 19:21:21');
+
+-- ----------------------------
+-- Table structure for system_api
+-- ----------------------------
+DROP TABLE IF EXISTS `system_api`;
+CREATE TABLE `system_api`  (
+  `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `pid` smallint(5) NOT NULL DEFAULT 1 COMMENT '项目组 默认1 我的项目',
+  `title` varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '' COMMENT '接口名称',
+  `url` varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '' COMMENT '接口地址',
+  `restype` tinyint(1) UNSIGNED NOT NULL DEFAULT 1 COMMENT '1 默认POST 2 GET',
+  `version` varchar(10) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '' COMMENT '版本',
+  `controller` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '控制器',
+  `action` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '方法',
+  `lastuser` varchar(20) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '' COMMENT '最后更新者',
+  `lasttime` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '最后更新时间',
+  `adduser` varchar(20) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '' COMMENT '添加者',
+  `addtime` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT '添加时间',
+  `intro` varchar(300) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '备注信息',
+  `is_del` tinyint(1) UNSIGNED NOT NULL DEFAULT 0 COMMENT '0 正常 1 弃用',
+  `last_update_time` timestamp(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0),
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 6 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '接口表' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of system_api
+-- ----------------------------
+INSERT INTO `system_api` VALUES (1, 0, '获取验证码', 'getcaptcha', 1, '', 'LoginController', 'getCaptcha', '', 0, '', 0, '', 0, '2020-04-10 13:29:28');
+INSERT INTO `system_api` VALUES (2, 0, '登录', 'login', 1, '', 'LoginController', 'login', '', 0, '', 0, '', 0, '2020-04-10 13:29:27');
+INSERT INTO `system_api` VALUES (3, 0, '刷新令牌', 'refresh', 1, '', 'LoginController', 'refresh', '', 0, '', 0, '', 0, '2020-04-10 11:02:28');
+INSERT INTO `system_api` VALUES (4, 0, '退出登录', 'outlogin', 1, '', 'LoginController', 'outLogin', '', 0, '', 0, '', 0, '2020-04-10 11:02:16');
+INSERT INTO `system_api` VALUES (5, 0, '添加用户', 'edituser', 1, '', 'LoginController', 'editUser', '', 0, '', 0, '', 0, '2020-04-10 11:02:27');
+
+SET FOREIGN_KEY_CHECKS = 1;
+
+
+log 库
+
+CREATE TABLE `user_login`  (
+  `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `uid` int(10) UNSIGNED NOT NULL,
+  `username` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+  `status` tinyint(1) UNSIGNED NOT NULL DEFAULT 0 COMMENT '0 登录 2 退出',
+  `ip` char(15) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT 'ip地址',
+  `addtime` int(10) UNSIGNED NOT NULL COMMENT '操作时间',
+  `last_update_time` timestamp(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0),
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `uid`(`uid`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 11 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '用户登录记录表' ROW_FORMAT = Dynamic;
+
+
+CREATE TABLE `user_operate`  (
+  `id` bigint(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `uid` int(10) UNSIGNED NOT NULL,
+  `username` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `ip` varchar(15) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `operate_type` tinyint(1) UNSIGNED NOT NULL COMMENT '操作类型 1添加 2修改 3删除',
+  `obj_type` tinyint(2) UNSIGNED NOT NULL COMMENT '操作对象类型',
+  `obj_id` int(10) UNSIGNED NOT NULL COMMENT '操作对象ID',
+  `obj_data` json NOT NULL COMMENT '操作对象实体 ',
+  `addtime` int(10) UNSIGNED NOT NULL COMMENT '操作时间',
+  `last_update_time` timestamp(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0),
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `uid`(`uid`) USING BTREE
+) ENGINE = MyISAM AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '用户操作记录表' ROW_FORMAT = Dynamic;
+
+
